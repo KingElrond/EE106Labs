@@ -1,0 +1,16 @@
+<launch>
+  <!-- Optional: pass args to your nodes (only if your scripts read argv/params) -->
+  <!-- <arg name="rate" default="10" /> -->
+
+  <!-- Start publisher -->
+  <node pkg="ee106w26"
+        type="publisher.py"
+        name="lab1_publisher"
+        output="screen" />
+
+  <!-- Start subscriber -->
+  <node pkg="ee106w26"
+        type="subscriber.py"
+        name="lab1_subscriber"
+        output="screen" />
+</launch>
