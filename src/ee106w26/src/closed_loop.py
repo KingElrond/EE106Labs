@@ -14,7 +14,7 @@ class Controller:
         self.set_point = set_point # reference (desired value)
         self.previous_error = 0
 
-    def update(self, current_value, theta_error=false):
+    def update(self, current_value, theta_error=False):
         # calculate P_term and D_term
         error = self.set_point - current_value
         if theta_error:
@@ -73,9 +73,13 @@ class Turtlebot():
                 #get dist
                 disX = gx-x
                 disY = gy-y
-                dist = sqrt(disX** + disY**)
+                dist = sqrt(disX**2 + disY**2)
                 #check if at goal
-                if dist < 0.05:
+                dist_threshold = 0.05
+                #adding thing for last waypoint stopping within 0.1 of it.
+                if (gx == 0.0) and (gy == 0.0):
+                    dist_threshold = 0.01
+                if dist < dist_threshold:
                     self.vel_pub.publish(Twist()) #stop
                     self.rate.sleep()
                     break
@@ -94,8 +98,10 @@ class Turtlebot():
                 #set linear vel
                 if (gth - th) > 0.5:
                     v = 0.0
-                elif (gth - th) > 0.2:
+                elif (gth - th) > 0.2 and dist > 0.2:
                     v = 0.1 #half max speed
+                elif dist <= 0.2:
+                    v = 0.01 #min speed
                 else:
                     v = 0.22 #max linear speed
                 
