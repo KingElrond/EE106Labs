@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 from math import pi, sqrt, atan2, cos, sin
 import numpy as np
@@ -28,6 +28,9 @@ class Turtlebot():
         self.logging_counter = 0
         self.trajectory = list()
         self.odom_sub = rospy.Subscriber("odom", Odometry, self.odom_callback)
+        
+        self.prev_vx, self.prev_vy = 0.0, 0.0
+        self.prev_wp = [0,0]
 
         try:
             self.run()
@@ -49,6 +52,8 @@ class Turtlebot():
     def move_to_point(self, current_waypoint, next_waypoint):
         # generate polynomial trajectory and move to current_waypoint
         # next_waypoint is to help determine the velocity to pass current_waypoint
+        
+        
         pass
 
 
@@ -56,7 +61,16 @@ class Turtlebot():
         # input: p,v: position and velocity of start/end point
         #        T: the desired time to complete this segment of trajectory (in second)
         # output: the coefficients of this polynomial
-        pass
+        #find a0, a1, a2, a3 x0-xt a,b,c,d
+        matrix_x = np.array([p_start, p_end, v_start, v_end], dtype=float)
+        matrix_t = np.array([
+            [0,    0,   0, 1],
+            [T**3, T**2, T, 1],
+            [0,    0,   1, 0],
+            [3*T**2, 2*T, 1, 0]
+        ], dtype=float)
+        a3, a2, a1, a0 = np.linalg.solve(matrix_t, matrix_x)
+        return a0, a1, a2, a3
 
 
     def odom_callback(self, msg):
