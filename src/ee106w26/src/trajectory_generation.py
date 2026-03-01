@@ -9,7 +9,35 @@ from std_msgs.msg import Empty
 from nav_msgs.msg import Odometry
 from geometry_msgs.msg import Twist, Pose2D
 
+class Controller: #PID controller from lab 4
+    def __init__(self, P=0.0, D=0.0, set_point=0):
+        self.Kp = P
+        self.Kd = D
+        self.set_point = set_point # reference (desired value)
+        self.previous_error = 0
 
+    def update(self, current_value, theta_error=False):
+        # calculate P_term and D_term
+        error = self.set_point - current_value
+        if theta_error:
+            while error > pi:
+                error -= 2*pi
+            while error < -pi:
+                error += 2*pi
+        P_term = self.Kp * error #Kp e(t)
+        D_term = self.Kd * (error - self.previous_error) #Kd(e(t)-e(t-dt))
+        self.previous_error = error
+        return P_term + D_term
+
+    def setPoint(self, set_point):
+        self.set_point = set_point
+        self.previous_error = 0
+
+    def setPD(self, P=0.0, D=0.0):
+        self.Kp = P
+        self.Kd = D
+        
+        
 class Turtlebot():
     def __init__(self):
         rospy.init_node("turtlebot_move")
