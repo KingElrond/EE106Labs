@@ -74,9 +74,22 @@ class Turtlebot():
 
 
     def run(self):
-        waypoints = [[0.5, 0], [0.5, -0.5], [1, -0.5], [1, 0], [1, 0.5],\
-                      [1.5, 0.5], [1.5, 0], [1.5, -0.5], [1, -0.5], [1, 0],\
-                      [1, 0.5], [0.5, 0.5], [0.5, 0], [0, 0], [0, 0]]
+        waypoints = [
+            [0.0, 0.0],
+            [0.0, 1.0],
+            [0.0, 2.0],
+            [0.0, 3.0],
+            [0.0, 4.0],
+            [1.0, 4.0],
+            [2.0, 4.0],
+            [2.0, 3.0],
+            [2.0, 2.0],
+            [3.0, 2.0],
+            [4.0, 2.0],
+            [4.0, 1.0],
+            [4.0, 0.0],
+            [4.0, 0.0],
+        ]
         for i in range(len(waypoints)-1):
             self.move_to_point(waypoints[i], waypoints[i+1])
 
@@ -177,6 +190,7 @@ class Turtlebot():
                 v = 0.1 #half max speed
             elif gdist <= 0.2 or (T - t) <= 0.3:
                 v = gEndVel #the desired end speed.
+                
             else:
                 v = 0.22 #max linear speed
             
