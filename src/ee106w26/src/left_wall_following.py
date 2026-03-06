@@ -44,21 +44,28 @@ class turtlebot_behavior:
         dists = []
         for p in pts:
             try:
-                self.tf_listener.waitForTransform('left_limit', p.header.frame_id, p.header.stamp, rospy.Duration(0.1))
-                p_out = self.tf_listener.transformPoint('left_limit', p)
-                dx = p_out.point.x
-                dy = p_out.point.y
-                dists.append(math.hypot(dx, dy))
+            	p.header.stamp = rospy.Time(0)
+            	self.tf_listener.waitForTransform('left_limit', p.header.frame_id, rospy.Time(0), rospy.Duration(0.1))
+            	p_out = self.tf_listener.transformPoint('left_limit', p)
+            	dx = p_out.point.x
+            	dy = p_out.point.y
+            	dists.append(math.hypot(dx, dy))
             except (tf.LookupException, tf.ExtrapolationException):
                 rospy.logwarn_throttle(5, "TF to left limit not available")
                 continue
 
         cmd = Twist()
 
-        if not dists or not pts:
-            rospy.loginfo("No points in the left window")
+        if not dists:
+            rospy.loginfo("No dists in the left window")
             cmd.linear.x = 0.05
             cmd.angular.z = 0.07
+            self.cmd_pub.publish(cmd)
+            return
+        if not pts:
+            cmd.linear.x = 0.0
+            cmd.angular.z = 0.0
+            rospt.loginfo("No pts in the left window")
             self.cmd_pub.publish(cmd)
             return
 
@@ -70,7 +77,7 @@ class turtlebot_behavior:
         ]
         min_front_dist = min(front_angles) if front_angles else float('inf')
 
-        if min_front_dist < 0.3:
+        if min_front_dist < 0.3:#obstacles
             rospy.logwarn("Obstacle ahead: stopping")
             cmd.linear.x = 0.0		#
             cmd.angular.z = -0.4	#-0.2
@@ -84,7 +91,7 @@ class turtlebot_behavior:
             self.cmd_pub.publish(cmd)
             return
 
-        if min(dists) > 0.4:
+        if min(dists) > 0.4:#wall
             rospy.loginfo("Sharp left")
             cmd.linear.x = 0.08		#0.1
             cmd.angular.z = 0.4	#0.2
