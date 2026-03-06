@@ -17,7 +17,7 @@ class turtlebot_behavior:
         self.cmd_pub = rospy.Publisher("/cmd_vel", Twist, queue_size=1)
         self.tf_listener = tf.TransformListener()
         rospy.Subscriber("/scan", LaserScan, self.callback)
-        rospy.loginfo("Left wall follower initialized")
+        rospy.loginfo("left wall follower")
 
     def callback(self, data):
         pts = []
@@ -57,7 +57,7 @@ class turtlebot_behavior:
 
         if not dists or not pts:
             rospy.loginfo("No points in the left window")
-            cmd.linear.x = 0.07
+            cmd.linear.x = 0.05
             cmd.angular.z = 0.07
             self.cmd_pub.publish(cmd)
             return
@@ -72,36 +72,36 @@ class turtlebot_behavior:
 
         if min_front_dist < 0.3:
             rospy.logwarn("Obstacle ahead: stopping")
-            cmd.linear.x = 0.0
-            cmd.angular.z = -0.4
+            cmd.linear.x = 0.0		#
+            cmd.angular.z = -0.4	#-0.2
             self.cmd_pub.publish(cmd)
             return
 
         if 0.3 < min_front_dist < 0.5:
-            rospy.loginfo("Preparing right turn to avoid front obstacle")
-            cmd.linear.x = 0.0
-            cmd.angular.z = -0.4
+            rospy.loginfo("right turn front obstacle")
+            cmd.linear.x = 0.0		#
+            cmd.angular.z = -0.4	#-0.2
             self.cmd_pub.publish(cmd)
             return
 
         if min(dists) > 0.4:
-            rospy.loginfo("Sharp left turn")
-            cmd.linear.x = 0.2
-            cmd.angular.z = 0.4
+            rospy.loginfo("Sharp left")
+            cmd.linear.x = 0.08		#0.1
+            cmd.angular.z = 0.4	#0.2
             self.cmd_pub.publish(cmd)
             return
 
         if min(dists) < 0.1:
             rospy.loginfo("Left obstacle: steer right")
-            cmd.linear.x = 0.1
+            cmd.linear.x = 0.08		
             cmd.angular.z = -0.05
         elif min(dists) > 0.2:
             rospy.loginfo("Too far from left wall: steer left")
-            cmd.linear.x = 0.1
+            cmd.linear.x = 0.08
             cmd.angular.z = 0.05
         else:
             rospy.loginfo("keep going on left wall")
-            cmd.linear.x = 0.1
+            cmd.linear.x = 0.08
             cmd.angular.z = 0.0
 
         self.cmd_pub.publish(cmd)
